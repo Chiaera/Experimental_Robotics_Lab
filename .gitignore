@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS e file temporanei
+*~
+*.swp
+.DS_Store
+
+# IDEs 
+.vscode/
