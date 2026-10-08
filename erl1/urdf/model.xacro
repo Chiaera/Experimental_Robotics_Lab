@@ -42,6 +42,10 @@
         <color rgba="0.8 0.8 0 1.0"/>
     </material>
 
+    <material name="green">
+        <color rgba="0.2 0.8 0.3 1.0"/>
+    </material>
+
 
     <!-- ......................................................................LINKS -->
     <!-- LINK CHASSIS -->
@@ -106,6 +110,75 @@
         </visual>
     </link>
 
+    <!-- LINK LINK1 -->
+    <link name="link1_to_base">
+        <inertial>
+            <mass value="3"/>
+            <origin rpy="0 0 0" xyz="0 0 0.05"/>
+            <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.141666666667"/>
+        </inertial>
+
+        <collision name="collision_link1_to_base">
+            <origin rpy="0 0 0" xyz="0 0 0.05"/>
+            <geometry>
+                <box size="0.1 0.1 0.1"/>
+            </geometry>
+        </collision>
+        <visual name="visual_link1_to_base">
+            <origin rpy="0 0 0" xyz="0 0 0.05"/>
+            <geometry>
+                <box size="0.1 0.1 0.1"/>
+            </geometry>
+            <material name="green"/>
+        </visual>
+    </link>
+
+    <!-- LINK LINK2 -->
+    <link name="link2_to_link1">
+        <inertial>
+            <mass value="3"/>
+            <origin rpy="0 0 0" xyz="0 0 0.25"/>
+            <inertia ixx="0.0004167" ixy="0" ixz="0" iyy="0.0835417" iyz="0" izz="0.0835417"/>
+        </inertial>
+
+        <collision name="collision_link2_to_link1">
+            <origin rpy="0 0 0" xyz="0 0 0.25"/>
+            <geometry>
+                <box size="0.05 0.05 0.5"/>
+            </geometry>
+        </collision>
+        <visual name="visual_link2_to_link1">
+            <origin rpy="0 0 0" xyz="0 0 0.25"/>
+            <geometry>
+                <box size="0.05 0.05 0.5"/>
+            </geometry>
+            <material name="green"/>
+        </visual>
+    </link>
+
+    <!-- LINK LINK3 -->
+    <link name="link3_to_link2">
+        <inertial>
+            <mass value="3"/>
+            <origin rpy="0 0 0" xyz="0 0 0.2"/>
+            <inertia ixx="0.0004167" ixy="0" ixz="0" iyy="0.0835417" iyz="0" izz="0.0835417"/>
+        </inertial>
+
+        <collision name="collision_link3_to_link2">
+            <origin rpy="0 0 0" xyz="0.025 0 0.2"/>
+            <geometry>
+                <box size="0.05 0.05 0.4"/>
+            </geometry>
+        </collision>
+        <visual name="visual_link3_to_link2">
+            <origin rpy="0 0 0" xyz="0.025 0 0.2"/>
+            <geometry>
+                <box size="0.05 0.05 0.4"/>
+            </geometry>
+            <material name="green"/>
+        </visual>
+    </link>
+
     <!-- ......................................................................JOINTS -->
     <!-- JOINT LEFT-WHEEL -->
     <joint type="continuous" name="left_wheel_joint">
@@ -127,7 +200,43 @@
         <dynamics damping="1.0" friction="1.0"/>
     </joint>
 
+    <!-- JOINT LINK1 -->
+    <joint type="continuous" name="link1_to_base_joint">
+        <origin xyz="0 0 0.035" rpy="0 0 0"/>
+        <child link="link1_to_base"/>
+        <parent link="link_chassis"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="5" velocity="1.0"/>
+        <dynamics damping="1.0" friction="1.0"/>
+    </joint>
+
+    <!-- JOINT LINK2 -->
+    <joint type="revolute" name="link2_to_link1_joint">
+        <origin xyz="0 0 0.1" rpy="0 0 0"/>
+        <child link="link2_to_link1"/>
+        <parent link="link1_to_base"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.57" upper="1.57" effort="5" velocity="1.0"/>
+        <dynamics damping="1.0" friction="1.0"/>
+    </joint>
+
+    <!-- JOINT LINK3 -->
+    <joint type="revolute" name="link3_to_link2_joint">
+        <origin xyz="0.025 0 0.4" rpy="0 0 0"/>
+        <child link="link3_to_link2"/>
+        <parent link="link2_to_link1"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-1.57" upper="1.57" effort="5" velocity="1.0"/>
+        <dynamics damping="1.0" friction="1.0"/>
+    </joint>
+
 
 </robot>
 
 <!-- ros2 launch urdf_tutorial display.launch.py model:=$PWD/src/erl1/urdf/model.xacro rvizconfig:=$PWD/src/erl1/rviz/urdf.rviz -->
+
+<!-- PER LE ALTEZZE: -->
+<!-- Quando considero il <link> devo considerare com'è l'origine rispetto al link stesso, quindi mi baso sui parametri <geometry>/2 dello stesso link -->
+<!-- Quando considero il <joint> devo considerare il figlio (ovvero il link considerato) rispetto al padre (link precedente) -->
+    <!-- SE considero il link1 rispetto alla base (chassis) allora devo considerare solo altezza_chassis/2 perchè il link della base usato come reference frame è a metà dello chassis -->
+    <!-- SE considero il linkY rispetto linkX invece devo considerare l'altezza totale rispetto al linkX precedente, per sistemare il nuovo link alla base del nuovo linkY aggiunto -->
