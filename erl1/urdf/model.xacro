@@ -1,0 +1,133 @@
+<?xml version='1.0'?>
+<robot name="erl1" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- <xacro:include filename="$(find erl1)/urdf/erl1.gazebo" /> -->
+
+    <!-- PROPERTY -->
+    <xacro:property name="length_wheel" value="0.05" />
+    <xacro:property name="radius_wheel" value="0.1" />
+
+    <!-- MACRO for wheels -->
+    <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+        <mass value="${mass}" />
+        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <inertia
+        ixx="${mass*(3*radius_wheel**2+length_wheel**2)/12}" ixy="0" ixz="0"
+        iyy="${mass*(3*radius_wheel**2+length_wheel**2)/12}" iyz="0"
+        izz="${mass*radius_wheel**2/2}"/>
+    </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="wheel_geometry">
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707"/>
+        <geometry>
+        <cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+        </geometry>
+    </xacro:macro>
+
+    <xacro:macro name="wheel_collision">
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707"/>
+        <geometry>
+            <cylinder radius="${radius_wheel}" length="${length_wheel}"/>
+        </geometry>
+    </xacro:macro>
+
+    <!-- MATERIAL -->
+    <material name="blue">
+        <color rgba="0.203125 0.23828125 0.28515625 1.0"/>
+    </material>
+
+    <material name="yellow">
+        <color rgba="0.8 0.8 0 1.0"/>
+    </material>
+
+
+    <!-- ......................................................................LINKS -->
+    <!-- LINK CHASSIS -->
+    <link name="link_chassis">
+        <!-- inertial -->
+        <inertial>
+            <mass value="5"/>
+            <origin rpy="0 0 0" xyz="0 0 0.1"/>
+            <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.141666666667"/>
+        </inertial>
+
+        <!-- body -->
+        <collision name="collision_chassis">
+            <geometry>
+                <box size="0.5 0.3 0.07"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.5 0.3 0.07"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+
+        <!-- caster front -->
+        <collision name="caster_front_collision">
+            <origin rpy="0 0 0" xyz="0.2 0 -0.05"/>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+        </collision>
+        <visual name="caster_front_visual">
+            <origin rpy="0 0 0" xyz="0.2 0 -0.05"/>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <!-- LINK LEFT-WHEEL -->
+    <link name='left_wheel'>
+        <xacro:default_inertial mass="5.0" />
+        <collision>
+            <xacro:wheel_collision/>
+        </collision>
+        <visual name='left_wheel_visual'>
+            <xacro:wheel_geometry/>
+            <material name="yellow"/>
+        </visual>
+    </link>
+
+    <!-- LINK RIGHT-WHEEL -->
+    <link name='right_wheel'>
+        <xacro:default_inertial mass="5.0" />
+        <collision>
+            <xacro:wheel_collision/>
+        </collision>
+        <visual name='right_wheel_visual'>
+            <xacro:wheel_geometry/>
+            <material name="yellow"/>
+        </visual>
+    </link>
+
+    <!-- ......................................................................JOINTS -->
+    <!-- JOINT LEFT-WHEEL -->
+    <joint type="continuous" name="left_wheel_joint">
+        <origin xyz="-0.1 0.15 0" rpy="0 0 0"/>
+        <child link="left_wheel"/>
+        <parent link="link_chassis"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="100" velocity="10"/>
+        <dynamics damping="1.0" friction="1.0"/>
+    </joint>
+
+    <!-- JOINT RIGHT-WHEEL -->
+    <joint type="continuous" name="right_wheel_joint">
+        <origin xyz="-0.1 -0.15 0" rpy="0 0 0"/>
+        <child link="right_wheel"/>
+        <parent link="link_chassis"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="100" velocity="10"/>
+        <dynamics damping="1.0" friction="1.0"/>
+    </joint>
+
+
+</robot>
+
+<!-- ros2 launch urdf_tutorial display.launch.py model:=$PWD/src/erl1/urdf/model.xacro rvizconfig:=$PWD/src/erl1/rviz/urdf.rviz -->
