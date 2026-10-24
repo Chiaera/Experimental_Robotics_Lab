@@ -54,7 +54,7 @@
         <!-- inertial -->
         <inertial>
             <mass value="5"/>
-            <origin rpy="0 0 0" xyz="0 0 0.1"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
             <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.141666666667"/>
         </inertial>
 
@@ -114,7 +114,7 @@
     <!-- LINK LINK1 -->
     <link name="link1_to_base">
         <inertial>
-            <mass value="3"/>
+            <mass value="0.2"/>
             <origin rpy="0 0 0" xyz="0 0 0.05"/>
             <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.141666666667"/>
         </inertial>
@@ -137,7 +137,7 @@
     <!-- LINK LINK2 -->
     <link name="link2_to_link1">
         <inertial>
-            <mass value="3"/>
+            <mass value="0.2"/>
             <origin rpy="0 0 0" xyz="0 0 0.25"/>
             <inertia ixx="0.0004167" ixy="0" ixz="0" iyy="0.0835417" iyz="0" izz="0.0835417"/>
         </inertial>
@@ -160,7 +160,7 @@
     <!-- LINK LINK3 -->
     <link name="link3_to_link2">
         <inertial>
-            <mass value="3"/>
+            <mass value="0.2"/>
             <origin rpy="0 0 0" xyz="0 0 0.2"/>
             <inertia ixx="0.0004167" ixy="0" ixz="0" iyy="0.0835417" iyz="0" izz="0.0835417"/>
         </inertial>

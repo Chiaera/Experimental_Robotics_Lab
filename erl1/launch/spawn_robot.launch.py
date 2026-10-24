@@ -99,10 +99,10 @@ def generate_launch_description():
         executable="parameter_bridge",
         arguments= [
             "/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
-            "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry"
-            #"/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"
-            #"/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
-            #"/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V"
+            "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry",
+            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+            "/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
+            "/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V"
         ],
         output="screen",
         parameters=[
@@ -132,3 +132,18 @@ def generate_launch_description():
 #   ros2 topic echo /channel_name: "listen" to the topic
 # 
 #   ros2 topic info /channel_name: verify the type of message associated and the node connected to it 
+
+
+# TEST:
+# 1- TIme
+#       gz topic -e -t /clock
+#       If Gazebo is at 'play' it should print the seconds number
+#
+# 2 - Gazebo-Bridge
+#       gz topic -e -t /cmd_vel
+#       After ros2 run teleop_twist_keyboard teleop_twist_keyboard
+#           If the command is pressed, it should print the vel number
+#
+# 3 - Physics
+#       gz topic -e -t /odom
+#       It should update the odometry
