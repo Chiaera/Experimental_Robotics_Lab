@@ -27,7 +27,7 @@ def generate_launch_description():
     )
 
     model_arg = DeclareLaunchArgument(
-        'model', default_value='model.xacro',
+        'erl1', default_value='erl1.xacro',
         description='Name of the URDF description to load'
     )
 
@@ -35,7 +35,7 @@ def generate_launch_description():
     urdf_file_path = PathJoinSubstitution([
         pkg_erl1, 
         "urdf",
-        LaunchConfiguration('model') # Replace with your URDF or Xacro file
+        LaunchConfiguration('erl1') # Replace with your URDF or Xacro file
     ])
 
     world_launch = IncludeLaunchDescription(
@@ -93,6 +93,19 @@ def generate_launch_description():
         executable='joint_state_publisher_gui'
     )
 
+    gz_image_bridge_node = Node(
+        package="ros_gz_image",
+        executable="image_bridge",
+        arguments=[
+            "/camera/image",
+        ],
+        output="screen",
+        parameters=[
+            {'use_sim_time': True,
+             'camera.image.compressed.jpeg_quality': 75},
+        ],
+    )
+
     # GAZEVO BRIDGE: Node to bridge messages like /cmd_vel and /odom
     gz_bridge_node = Node (
         package="ros_gz_bridge",
@@ -102,7 +115,8 @@ def generate_launch_description():
             "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry",
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             "/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
-            "/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V"
+            #"/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
+            "/camera_joint/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double",
         ],
         output="screen",
         parameters=[
@@ -121,6 +135,7 @@ def generate_launch_description():
     launchDescriptionObject.add_action(robot_state_publisher_node)
     launchDescriptionObject.add_action(joint_state_publisher_gui_node)
     launchDescriptionObject.add_action(gz_bridge_node)
+    launchDescriptionObject.add_action(gz_image_bridge_node)
 
     return launchDescriptionObject
 
@@ -147,3 +162,10 @@ def generate_launch_description():
 # 3 - Physics
 #       gz topic -e -t /odom
 #       It should update the odometry
+
+# CAMERA ROTATION
+# ros2 topic pub --once /camera_joint/cmd_pos std_msgs/msg/Float64 "{data: 1.0}"
+#
+# to see the graphic interface: ros2 run rqt_image_view rqt_image_view
+# (selecting from menu camera topic [camera/image])
+# to set paramethers: ros2 run rqt_reconfigure rqt_reconfigure

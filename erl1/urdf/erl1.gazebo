@@ -32,11 +32,58 @@
         </plugin>
 
         <plugin
+            filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+            <joint_name>camera_joint</joint_name>
+            <topic>/camera_joint/cmd_pos</topic>
+            <p_gain>5</p_gain>
+            <i_gain>0.1</i_gain>
+            <d_gain>0.5</d_gain>
+        </plugin>
+
+        <!--JointStatePublisher plugin-->
+        <plugin
             filename="gz-sim-joint-state-publisher-system"
             name="gz::sim::systems::JointStatePublisher">
             <topic>joint_states</topic>
             <joint_name>left_wheel_joint</joint_name>
             <joint_name>right_wheel_joint</joint_name>
+            <joint_name>camera_joint</joint_name>
         </plugin>
     </gazebo>
+
+    <gazebo reference="camera_link">
+    <sensor name="camera" type="camera">
+      <camera>
+        <!--view of simulated camera-->
+        <horizontal_fov>1.3962634</horizontal_fov> 
+        <!--propertiews of video stream-->
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>15</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+        <!--ensure the right static transformations between coordinate system-->
+        <optical_frame_id>camera_link_optical</optical_frame_id>
+        <!--camera_topic that describes physical properties of the camera-->
+        <camera_info_topic>camera/camera_info</camera_info_topic>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>20</update_rate>
+      <visualize>true</visualize>
+      <topic>camera/image</topic>
+    </sensor>
+  </gazebo>
 </robot>

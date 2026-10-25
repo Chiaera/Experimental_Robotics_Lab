@@ -1,5 +1,6 @@
 <?xml version='1.0'?>
-<robot name="erl1" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="erl1_exercise1" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<!-- Robot used for Exercise1 -->
 
     <!-- INCLUDE -->
     <xacro:include filename="$(find erl1)/urdf/erl1.gazebo" />
