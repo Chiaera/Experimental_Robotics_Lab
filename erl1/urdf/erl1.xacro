@@ -144,6 +144,34 @@
     <link name="imu_link">
     </link>
 
+    <!-- GPS LINK -->
+    <link name="navsat_link">
+    </link>
+
+    <!-- LIDAR LINK -->
+    <link name='scan_link'>
+        <inertial>
+            <mass value="1e-5"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia
+                ixx="1e-6" ixy="0" ixz="0"
+                iyy="1e-6" iyz="0"
+                izz="1e-6"/>
+        </inertial>
+        <collision name='collision'>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size=".1 .1 .1"/>
+            </geometry>
+        </collision>
+        <visual name='scan_link_visual'>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.05" length="0.1"/>
+            </geometry>
+        </visual>
+    </link>
+
     <!-- ......................................................................JOINTS -->
     <!-- JOINT LEFT-WHEEL -->
     <joint type="continuous" name="left_wheel_joint">
@@ -186,6 +214,20 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <parent link="link_chassis"/>
         <child link="imu_link" />
+    </joint>
+
+    <!-- JOINT GPS -->
+    <joint name="navsat_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0"/> 
+        <parent link="link_chassis"/>
+        <child link="navsat_link" />
+    </joint>
+
+    <!-- JOINT LIDAR -->
+    <joint type="fixed" name="scan_joint">
+        <origin xyz="-0.2 0 0.19" rpy="0 0 0"/>
+        <child link="scan_link"/>
+        <parent link="link_chassis"/>
     </joint>
 
 </robot>

@@ -117,9 +117,13 @@ def generate_launch_description():
             "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry",
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             "/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
-            #"/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
-            "/camera_joint/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double",
+            # "tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",   #Camera RGDB
+            #"/camera/depth_image@sensor_msgs/msg/Image[gz.msgs.Image",  #Camera RGDB
+            #"/camera/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked",  #Camera RGDB
+            "/camera_joint/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double",    #Camera Standard
             "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
+            "/navsat@sensor_msgs/msg/NavSatFix[gz.msgs.NavSat",
+            "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
         ],
         output="screen",
         parameters=[
@@ -148,7 +152,7 @@ def generate_launch_description():
     launchDescriptionObject.add_action(rviz_node)
     launchDescriptionObject.add_action(spawn_urdf_node)
     launchDescriptionObject.add_action(robot_state_publisher_node)
-    launchDescriptionObject.add_action(joint_state_publisher_gui_node)
+    launchDescriptionObject.add_action(joint_state_publisher_gui_node) #Camera Standard
     launchDescriptionObject.add_action(gz_bridge_node)
     launchDescriptionObject.add_action(gz_image_bridge_node)
     launchDescriptionObject.add_action(ekf_node)
@@ -158,6 +162,9 @@ def generate_launch_description():
 
 
 # MEMO TERMINAL:
+#   ros2 launch erl1 spawn_robot.launch.py
+#   + to move the robot: ros2 run teleop_twist_keyboard teleop_twist_keyboard
+#
 #   ros2 topic list: all active channels
 # 
 #   ros2 topic echo /channel_name: "listen" to the topic
@@ -179,6 +186,7 @@ def generate_launch_description():
 #       gz topic -e -t /odom
 #       It should update the odometry
 
+
 # CAMERA ROTATION
 # ros2 topic pub --once /camera_joint/cmd_pos std_msgs/msg/Float64 "{data: 1.0}"
 #
@@ -186,8 +194,16 @@ def generate_launch_description():
 # (selecting from menu camera topic [camera/image])
 # to set paramethers: ros2 run rqt_reconfigure rqt_reconfigure
 
-# IMU
-# to vizualize IMU in Rviz: sudo apt install ros-jazzy-rviz-imu-plugin
+
+# CAMERA RGDB
+# test on Rvizz: add 'Cloudpoint2' and select /camera/point on topic
+
 
 # EKF
-# necessary the package: sudo apt install ros-jazzy-robot-localization
+# to test it use the odometry on Rvizz
+
+
+# GPS
+# to test: python3 gps_follower.py 
+
+ 
