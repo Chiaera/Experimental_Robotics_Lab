@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <robot>
     <gazebo>
+        <!--Robot movements, Odometry plugin-->
         <plugin
             filename="gz-sim-diff-drive-system"
             name="gz::sim::systems::DiffDrive">
@@ -31,6 +32,7 @@
             <odom_publish_frequency>30</odom_publish_frequency>
         </plugin>
 
+        <!--JointPosition plugin-->
         <plugin
             filename="gz-sim-joint-position-controller-system"
             name="gz::sim::systems::JointPositionController">
@@ -52,6 +54,7 @@
         </plugin>
     </gazebo>
 
+    <!--Camera-->
     <gazebo reference="camera_link">
     <sensor name="camera" type="camera">
       <camera>
@@ -86,4 +89,17 @@
       <topic>camera/image</topic>
     </sensor>
   </gazebo>
+
+  <!--IMU-->
+    <gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <visualize>true</visualize>
+        <topic>imu</topic>
+        <enable_metrics>true</enable_metrics>
+        <gz_frame_id>imu_link</gz_frame_id>
+    </sensor>
+    </gazebo>
+
 </robot>

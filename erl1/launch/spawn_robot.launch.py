@@ -117,6 +117,7 @@ def generate_launch_description():
             "/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
             #"/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
             "/camera_joint/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double",
+            "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
         ],
         output="screen",
         parameters=[
@@ -169,3 +170,6 @@ def generate_launch_description():
 # to see the graphic interface: ros2 run rqt_image_view rqt_image_view
 # (selecting from menu camera topic [camera/image])
 # to set paramethers: ros2 run rqt_reconfigure rqt_reconfigure
+
+# IMU
+# to vizualize IMU in Rviz: sudo apt install ros-jazzy-rviz-imu-plugin

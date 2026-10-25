@@ -140,6 +140,10 @@
     <link name="camera_link_optical">
     </link>
 
+    <!-- IMU LINK -->
+    <link name="imu_link">
+    </link>
+
     <!-- ......................................................................JOINTS -->
     <!-- JOINT LEFT-WHEEL -->
     <joint type="continuous" name="left_wheel_joint">
@@ -175,6 +179,13 @@
         <origin xyz="0 0 0" rpy="-1.5707 0 -1.5707"/>
         <child link="camera_link_optical"/>
         <parent link="camera_link"/>
+    </joint>
+
+    <!-- JOINT IMU -->
+    <joint name="imu_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="link_chassis"/>
+        <child link="imu_link" />
     </joint>
 
 </robot>
