@@ -73,6 +73,7 @@ def generate_launch_description():
         ]
     )
 
+    # Robot state publiher
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -93,6 +94,7 @@ def generate_launch_description():
         executable='joint_state_publisher_gui'
     )
 
+    # Gazebo bridge for the camera
     gz_image_bridge_node = Node(
         package="ros_gz_image",
         executable="image_bridge",
@@ -125,6 +127,18 @@ def generate_launch_description():
         ]
     )
 
+    # EKF 
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[
+            os.path.join(pkg_erl1, 'config', 'ekf.yaml'),
+            {'use_sim_time': True},
+        ]
+    )
+
     launchDescriptionObject = LaunchDescription()
 
     launchDescriptionObject.add_action(rviz_launch_arg)
@@ -137,6 +151,7 @@ def generate_launch_description():
     launchDescriptionObject.add_action(joint_state_publisher_gui_node)
     launchDescriptionObject.add_action(gz_bridge_node)
     launchDescriptionObject.add_action(gz_image_bridge_node)
+    launchDescriptionObject.add_action(ekf_node)
 
     return launchDescriptionObject
 
@@ -173,3 +188,6 @@ def generate_launch_description():
 
 # IMU
 # to vizualize IMU in Rviz: sudo apt install ros-jazzy-rviz-imu-plugin
+
+# EKF
+# necessary the package: sudo apt install ros-jazzy-robot-localization
