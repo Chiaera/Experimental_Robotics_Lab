@@ -6,12 +6,12 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
+
     pkg_erl1= get_package_share_directory('erl1')
+
     gazebo_models_path, ignore_last_dir = os.path.split(pkg_erl1)
-    
     # lets Gazebo find package://erl1/... (e.g. the meshes)
     gz_path = os.environ.get("GZ_SIM_RESOURCE_PATH", "")
     os.environ["GZ_SIM_RESOURCE_PATH"] = gz_path + os.pathsep + gazebo_models_path
@@ -22,28 +22,28 @@ def generate_launch_description():
     )
 
     world_arg = DeclareLaunchArgument(
-        'world', default_value= 'gazebo_world.sdf',
+        'world', default_value='my_world.sdf',
         description='Name of the Gazebo world file to load'
     )
 
     model_arg = DeclareLaunchArgument(
-        'erl1', default_value='erl1.xacro',
+        'model', default_value='my_robot.urdf',
         description='Name of the URDF description to load'
     )
 
     # Define the path to your URDF or Xacro file
     urdf_file_path = PathJoinSubstitution([
-        pkg_erl1, 
+        pkg_erl1,  # Replace with your package name
         "urdf",
-        LaunchConfiguration('erl1') # Replace with your URDF or Xacro file
+        LaunchConfiguration('model')  # Replace with your URDF or Xacro file
     ])
 
     world_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-        os.path.join(pkg_erl1, 'launch', 'gazebo_world.launch.py'),
+            os.path.join(pkg_erl1, 'launch', 'world.launch.py'),
         ),
         launch_arguments={
-            'world': LaunchConfiguration('world'),  
+        'world': LaunchConfiguration('world'),
         }.items()
     )
 
@@ -63,9 +63,9 @@ def generate_launch_description():
         package="ros_gz_sim",
         executable="create",
         arguments=[
-            "-name", "erl1",
+            "-name", "my_robot",
             "-topic", "robot_description",
-            "-x", "0.0", "-y", "0.0", "-z", "0.5", "-Y", "0.0" # Initial spawn position
+            "-x", "0.0", "-y", "0.0", "-z", "0.5", "-Y", "0.0"  # Initial spawn position
         ],
         output="screen",
         parameters=[
@@ -73,15 +73,14 @@ def generate_launch_description():
         ]
     )
 
-    # Robot state publiher
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output='screen',
         parameters=[
-            {'robot_description': ParameterValue(Command(['xacro ', urdf_file_path]), value_type=str),
-            'use_sim_time': True},
+            {'robot_description': Command(['xacro', ' ', urdf_file_path]),
+             'use_sim_time': True},
         ],
         remappings=[
             ('/tf', 'tf'),
@@ -91,10 +90,10 @@ def generate_launch_description():
 
     joint_state_publisher_gui_node = Node(
         package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui'
+        executable='joint_state_publisher_gui',
+        parameters=[{'use_sim_time': True}],
     )
 
-    # Gazebo bridge for the camera
     gz_image_bridge_node = Node(
         package="ros_gz_image",
         executable="image_bridge",
@@ -108,30 +107,6 @@ def generate_launch_description():
         ],
     )
 
-    # GAZEVO BRIDGE: Node to bridge messages like /cmd_vel and /odom
-    gz_bridge_node = Node (
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        arguments= [
-            "/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
-            "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry",
-            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
-            "/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
-            # "tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",   #Camera RGDB
-            #"/camera/depth_image@sensor_msgs/msg/Image[gz.msgs.Image",  #Camera RGDB
-            #"/camera/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked",  #Camera RGDB
-            "/camera_joint/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double",    #Camera Standard
-            "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
-            "/navsat@sensor_msgs/msg/NavSatFix[gz.msgs.NavSat",
-            "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
-        ],
-        output="screen",
-        parameters=[
-            {'use_sim_time': True},
-        ]
-    )
-
-    # EKF 
     ekf_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -140,8 +115,37 @@ def generate_launch_description():
         parameters=[
             os.path.join(pkg_erl1, 'config', 'ekf.yaml'),
             {'use_sim_time': True},
+             ]
+    )
+
+
+
+    gz_bridge_node = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            "/clock@rosgraph_msgs/msg/Cloccd k[gz.msgs.Clock",
+            "/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
+            "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry",
+            "/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model",
+            #"/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
+            #"/camera/image@sensor_msgs/msg/Image[gz.msgs.Image",
+            "/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo",
+            "/camera_joint/cmd_pos@std_msgs/msg/Float64]gz.msgs.Double",
+            "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
+           # "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+           # "/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked",
+           # "/camera/depth_image@sensor_msgs/msg/Image[gz.msgs.Image",
+           # "/camera/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked",
+
+        ],
+        output="screen",
+        parameters=[
+            {'use_sim_time': True},
         ]
     )
+
+
 
     launchDescriptionObject = LaunchDescription()
 
@@ -152,58 +156,9 @@ def generate_launch_description():
     launchDescriptionObject.add_action(rviz_node)
     launchDescriptionObject.add_action(spawn_urdf_node)
     launchDescriptionObject.add_action(robot_state_publisher_node)
-    launchDescriptionObject.add_action(joint_state_publisher_gui_node) #Camera Standard
+    #launchDescriptionObject.add_action(joint_state_publisher_gui_node)
     launchDescriptionObject.add_action(gz_bridge_node)
     launchDescriptionObject.add_action(gz_image_bridge_node)
     launchDescriptionObject.add_action(ekf_node)
 
     return launchDescriptionObject
-
-
-
-# MEMO TERMINAL:
-#   ros2 launch erl1 spawn_robot.launch.py
-#   + to move the robot: ros2 run teleop_twist_keyboard teleop_twist_keyboard
-#
-#   ros2 topic list: all active channels
-# 
-#   ros2 topic echo /channel_name: "listen" to the topic
-# 
-#   ros2 topic info /channel_name: verify the type of message associated and the node connected to it 
-
-
-# TEST:
-# 1- TIme
-#       gz topic -e -t /clock
-#       If Gazebo is at 'play' it should print the seconds number
-#
-# 2 - Gazebo-Bridge
-#       gz topic -e -t /cmd_vel
-#       After ros2 run teleop_twist_keyboard teleop_twist_keyboard
-#           If the command is pressed, it should print the vel number
-#
-# 3 - Physics
-#       gz topic -e -t /odom
-#       It should update the odometry
-
-
-# CAMERA ROTATION
-# ros2 topic pub --once /camera_joint/cmd_pos std_msgs/msg/Float64 "{data: 1.0}"
-#
-# to see the graphic interface: ros2 run rqt_image_view rqt_image_view
-# (selecting from menu camera topic [camera/image])
-# to set paramethers: ros2 run rqt_reconfigure rqt_reconfigure
-
-
-# CAMERA RGDB
-# test on Rvizz: add 'Cloudpoint2' and select /camera/point on topic
-
-
-# EKF
-# to test it use the odometry on Rvizz
-
-
-# GPS
-# to test: python3 gps_follower.py 
-
- 
