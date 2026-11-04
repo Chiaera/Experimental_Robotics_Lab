@@ -1,6 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
-#include "custom_msg/msg/marker.hpp"
+#include "custom_msgs/msg/box.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include <cmath>
 
@@ -27,7 +27,7 @@ class Visual: public rclcpp::Node
         }
     
     private:
-        void info_callback(const custom_msg::msg::Marker::SharedPtr msg){
+        void info_callback(const custom_msgs::msg::Box::SharedPtr msg){
             RCLCPP_INFO(this->get_logger(), "Info marker: %d,\nPose: %d, %d \nSize: %d px", msg->id, msg->x, msg->y, msg->size);
             x1_ = msg->x;
             y1_ = msg->y;
