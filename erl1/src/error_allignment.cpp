@@ -1,5 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include "custom_msgs/msg/box.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include <cmath>
@@ -18,10 +19,19 @@ class Visual: public rclcpp::Node
             std::string topic_name;
             this->get_parameter("marker_info_topic", topic_name);
 
-            
             subscription_ = this->create_subscription<custom_msgs::msg::Box>(topic_name, 10, std::bind(&Visual::info_callback, this, _1));
+
+            this->declare_parameter<std::string>("velocity_topic", "velocity_info");      
+            std::string topic_pub_name;
+            this->get_parameter("velocity_topic", topic_pub_name);
+
+            publisherVelocities_ = this->create_publisher<geometry_msgs::msg::Twist>(topic_pub_name, 10);
+
+            this->declare_parameter<std::string>("feedback_topic", "feedback_info");       
+            std::string topic_pub_feedback_name;
+            this->get_parameter("velocity_topic", topic_pub_feedback_name);
             
-            publisherVelocities_ = this->create_publisher<geometry_msgs::msg::Twist>("velocities", 10);
+            publisherFeedback_ = this->create_publisher<std_msgs::msg::Bool>(topic_pub_feedback_name, 10);
         }
     
     private:
@@ -50,6 +60,7 @@ class Visual: public rclcpp::Node
 
         rclcpp::Subscription<custom_msgs::msg::Box>::SharedPtr subscription_;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisherVelocities_;
+        rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr publisherFeedback_;
         int ux_, uy_, d_, id_, L;
 
 
